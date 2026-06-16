@@ -3,78 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SmartChatBot</title>
+<title>AI Security Assistant</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d0d0d; color: #e8e8ea; height: 100vh; overflow: hidden; }
 .app { display: flex; height: 100vh; }
 
-/* Sidebar */
-.sidebar { width: 280px; background: #141414; border-right: 1px solid #232323; display: flex; flex-direction: column; flex-shrink: 0; }
-.sidebar-header { padding: 18px 16px 14px; border-bottom: 1px solid #232323; }
-.sidebar-header h1 { font-size: 18px; font-weight: 700; background: linear-gradient(135deg, #4fc3f7, #81c784); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.sidebar-header p { font-size: 11px; color: #666; margin-top: 2px; }
-.new-chat-btn { margin: 12px 16px; padding: 10px; background: #1e1e1e; border: 1px solid #333; border-radius: 10px; color: #aaa; cursor: pointer; font-size: 13px; text-align: center; transition: all .2s; }
-.new-chat-btn:hover { background: #2a2a2a; border-color: #4fc3f7; color: #e8e8ea; }
-.conv-list { flex: 1; overflow-y: auto; padding: 4px 8px 8px; }
-.conv-list::-webkit-scrollbar { width: 4px; }
-.conv-list::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
-.conv-item {
-  padding: 10px 12px; border-radius: 10px; cursor: pointer; margin-bottom: 2px;
-  transition: background .15s; display: flex; justify-content: space-between; align-items: center;
-}
-.conv-item:hover { background: #1e1e1e; }
-.conv-item.active { background: #1a2a3a; }
-.conv-item .conv-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
-.conv-item .del-btn { display: none; padding: 2px 6px; background: transparent; border: none; color: #666; cursor: pointer; font-size: 14px; border-radius: 4px; line-height: 1; }
-.conv-item:hover .del-btn { display: block; }
-.conv-item .del-btn:hover { color: #ef5350; background: rgba(239,83,80,0.1); }
-
-/* Main area */
-.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.chat-header { padding: 14px 24px; border-bottom: 1px solid #1e1e1e; display: flex; justify-content: flex-end; align-items: center; background: #0d0d0d; }
-.user-info { display: flex; align-items: center; gap: 14px; }
-.user-info span { font-size: 13px; color: #888; }
-.logout-btn { padding: 6px 14px; background: transparent; border: 1px solid #333; color: #aaa; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all .2s; }
-.logout-btn:hover { border-color: #ef5350; color: #ef5350; }
-
-/* Messages */
-.messages { flex: 1; overflow-y: auto; padding: 24px 20%; display: flex; flex-direction: column; gap: 16px; }
-.messages::-webkit-scrollbar { width: 6px; }
-.messages::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-.message { max-width: 75%; padding: 14px 18px; border-radius: 16px; font-size: 14px; line-height: 1.7; position: relative; animation: fadeIn .2s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-.message.user { align-self: flex-end; background: linear-gradient(135deg, #1a5276, #1a3a5c); border-bottom-right-radius: 4px; }
-.message.assistant { align-self: flex-start; background: #1a1a1a; border: 1px solid #2a2a2a; border-bottom-left-radius: 4px; }
-.message.system { align-self: center; background: transparent; color: #666; font-size: 12px; padding: 6px 12px; max-width: 90%; text-align: center; }
-.message .meta { font-size: 11px; color: #666; margin-top: 8px; }
-.message .pii-tag { display: inline-block; background: #f59e0b; color: #0d0d0d; font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-left: 6px; font-weight: 600; }
-.message img.msg-img { max-width: 100%; max-height: 300px; border-radius: 8px; margin-top: 8px; display: block; }
-
-/* Input area */
-.input-area {
-  padding: 16px 20%; border-top: 1px solid #1e1e1e; background: #0d0d0d;
-  display: flex; gap: 10px; align-items: flex-end;
-}
-.input-wrapper {
-  flex: 1; display: flex; align-items: flex-end; gap: 8px;
-  background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 14px; padding: 4px 4px 4px 16px;
-  transition: border-color .2s;
-}
-.input-wrapper:focus-within { border-color: #4fc3f7; }
-.input-wrapper input { flex: 1; padding: 10px 0; background: transparent; border: none; color: #e8e8ea; font-size: 14px; outline: none; }
-.img-preview { display: none; align-items: center; gap: 6px; padding: 4px 8px; background: #1e1e1e; border-radius: 8px; font-size: 12px; color: #aaa; }
-.img-preview.show { display: flex; }
-.img-preview img { width: 28px; height: 28px; border-radius: 4px; object-fit: cover; }
-.img-preview .remove-img { cursor: pointer; color: #666; font-size: 14px; padding: 0 2px; }
-.img-preview .remove-img:hover { color: #ef5350; }
-.img-upload-btn { padding: 8px; background: transparent; border: none; color: #666; cursor: pointer; font-size: 18px; border-radius: 8px; line-height: 1; transition: all .2s; display: flex; align-items: center; }
-.img-upload-btn:hover { color: #4fc3f7; background: rgba(79,195,247,0.1); }
-.send-btn { padding: 10px 20px; background: #4fc3f7; border: none; border-radius: 12px; color: #0d0d0d; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .2s; white-space: nowrap; }
-.send-btn:hover { background: #29b6f6; }
-.send-btn:disabled { opacity: .4; cursor: not-allowed; }
-
-/* Auth */
+/* ===== Auth ===== */
 .auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; background: #0d0d0d; }
 .auth-card { background: #141414; padding: 40px; border-radius: 16px; width: 380px; border: 1px solid #232323; }
 .auth-card h2 { margin-bottom: 28px; text-align: center; font-size: 24px; background: linear-gradient(135deg, #4fc3f7, #81c784); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -84,12 +19,139 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .auth-card button:hover { background: #29b6f6; }
 .auth-card .toggle { text-align: center; margin-top: 16px; font-size: 13px; color: #666; }
 .auth-card .toggle a { color: #4fc3f7; cursor: pointer; }
+
+/* ===== Left Panel: Security Logs ===== */
+.left-panel { width: 260px; background: #141414; border-right: 1px solid #232323; display: flex; flex-direction: column; flex-shrink: 0; }
+.left-panel-header { padding: 18px 16px 14px; border-bottom: 1px solid #232323; }
+.left-panel-header h1 { font-size: 16px; font-weight: 700; color: #e8e8ea; }
+.left-panel-header p { font-size: 11px; color: #666; margin-top: 2px; }
+.log-list { flex: 1; overflow-y: auto; padding: 12px; }
+.log-list::-webkit-scrollbar { width: 4px; }
+.log-list::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+.log-empty { text-align: center; padding: 30px 10px; color: #555; font-size: 12px; }
+.log-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #1e1e1e; }
+.log-item:last-child { border-bottom: none; }
+.log-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.log-dot.level-1 { background: #4caf50; box-shadow: 0 0 6px rgba(76,175,80,0.4); }
+.log-dot.level-2 { background: #ff9800; box-shadow: 0 0 6px rgba(255,152,0,0.4); }
+.log-dot.level-3 { background: #f44336; box-shadow: 0 0 6px rgba(244,67,54,0.4); }
+.log-body { flex: 1; min-width: 0; }
+.log-time { font-size: 11px; color: #666; margin-bottom: 2px; }
+.log-action { font-size: 12px; color: #aaa; }
+.log-action span { font-weight: 600; }
+.log-action .action-send { color: #4caf50; }
+.log-action .action-redact { color: #ff9800; }
+.log-action .action-block { color: #f44336; }
+
+/* ===== Center Panel: Input + Security Result ===== */
+.center-panel { width: 400px; min-width: 320px; background: #0d0d0d; border-right: 1px solid #232323; display: flex; flex-direction: column; flex-shrink: 0; }
+.center-header { padding: 14px 20px; border-bottom: 1px solid #1e1e1e; display: flex; justify-content: space-between; align-items: center; }
+.center-header h2 { font-size: 15px; font-weight: 600; color: #e8e8ea; }
+.center-header .user-info { display: flex; align-items: center; gap: 12px; }
+.center-header .user-info span { font-size: 12px; color: #888; }
+.logout-btn { padding: 5px 12px; background: transparent; border: 1px solid #333; color: #aaa; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all .2s; }
+.logout-btn:hover { border-color: #ef5350; color: #ef5350; }
+
+.input-section { padding: 20px; border-bottom: 1px solid #1e1e1e; }
+.input-section label { display: block; font-size: 12px; color: #888; margin-bottom: 8px; }
+.security-textarea { width: 100%; min-height: 140px; padding: 12px 14px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; color: #e8e8ea; font-size: 14px; line-height: 1.6; outline: none; resize: vertical; font-family: inherit; transition: border-color .2s; }
+.security-textarea:focus { border-color: #4fc3f7; }
+.btn-row { display: flex; gap: 10px; margin-top: 12px; }
+.btn { padding: 10px 18px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; white-space: nowrap; }
+.btn-primary { background: #4fc3f7; color: #0d0d0d; }
+.btn-primary:hover { background: #29b6f6; }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+.btn-secondary { background: #1e1e1e; border: 1px solid #333; color: #aaa; }
+.btn-secondary:hover { background: #2a2a2a; border-color: #4fc3f7; color: #e8e8ea; }
+.btn-secondary:disabled { opacity: .4; cursor: not-allowed; }
+.btn-danger { background: #f44336; color: #fff; }
+.btn-danger:hover { background: #d32f2f; }
+
+/* Security Result Area */
+.result-section { flex: 1; overflow-y: auto; padding: 20px; }
+.result-section::-webkit-scrollbar { width: 5px; }
+.result-section::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+.result-hidden { display: none !important; }
+
+.result-card { background: #141414; border: 1px solid #232323; border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+.result-card h3 { font-size: 13px; color: #888; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.risk-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 10px; font-size: 14px; font-weight: 600; }
+.risk-badge.level-1 { background: rgba(76,175,80,0.12); color: #4caf50; border: 1px solid rgba(76,175,80,0.3); }
+.risk-badge.level-2 { background: rgba(255,152,0,0.12); color: #ff9800; border: 1px solid rgba(255,152,0,0.3); }
+.risk-badge.level-3 { background: rgba(244,67,54,0.12); color: #f44336; border: 1px solid rgba(244,67,54,0.3); }
+.risk-dot { width: 10px; height: 10px; border-radius: 50%; }
+.risk-badge.level-1 .risk-dot { background: #4caf50; }
+.risk-badge.level-2 .risk-dot { background: #ff9800; }
+.risk-badge.level-3 .risk-dot { background: #f44336; }
+
+.pii-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.pii-tag { background: rgba(255,152,0,0.15); color: #ff9800; font-size: 11px; padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(255,152,0,0.25); }
+
+.sanitized-preview { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px; font-size: 13px; line-height: 1.6; color: #aaa; white-space: pre-wrap; word-break: break-word; margin-top: 8px; }
+.sanitized-preview .redacted { background: rgba(255,152,0,0.25); color: #ff9800; padding: 1px 4px; border-radius: 4px; font-weight: 600; }
+
+.injection-alert { background: rgba(244,67,54,0.12); border: 1px solid rgba(244,67,54,0.3); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; color: #f44336; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+.injection-alert .alert-icon { font-size: 16px; }
+
+.decision-row { display: flex; gap: 10px; margin-top: 14px; }
+
+/* ===== Right Panel: AI Response ===== */
+.right-panel { flex: 1; min-width: 300px; background: #0d0d0d; display: flex; flex-direction: column; }
+.right-header { padding: 14px 24px; border-bottom: 1px solid #1e1e1e; }
+.right-header h2 { font-size: 15px; font-weight: 600; color: #e8e8ea; }
+.right-header p { font-size: 11px; color: #666; margin-top: 2px; }
+
+.response-area { flex: 1; overflow-y: auto; padding: 24px 28px; }
+.response-area::-webkit-scrollbar { width: 6px; }
+.response-area::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+.welcome-msg { color: #666; font-size: 14px; text-align: center; padding: 60px 20px; }
+
+.response-message { background: #141414; border: 1px solid #232323; border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.response-message.user-msg { border-left: 3px solid #4fc3f7; }
+.response-message.ai-msg { border-left: 3px solid #81c784; }
+.response-message.blocked-msg { border-left: 3px solid #f44336; background: rgba(244,67,54,0.06); }
+.response-message .msg-label { font-size: 11px; color: #666; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.response-message .msg-content { font-size: 14px; line-height: 1.7; color: #e8e8ea; }
+.response-message .msg-content code { background: #1e1e1e; padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #ff9800; }
+.response-message .msg-content pre { background: #1e1e1e; padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+.response-message .msg-content pre code { background: transparent; padding: 0; }
+.response-message .msg-content blockquote { border-left: 3px solid #333; padding-left: 12px; margin: 8px 0; color: #aaa; }
+.response-message .msg-content ul, .response-message .msg-content ol { margin: 8px 0 8px 20px; }
+.response-message .msg-content a { color: #4fc3f7; }
+.response-message .msg-content strong { color: #fff; }
+.response-message .msg-content em { color: #bbb; }
+.response-message .msg-content h1, .response-message .msg-content h2, .response-message .msg-content h3 { margin: 12px 0 6px; color: #fff; }
+.response-message .msg-content p { margin: 6px 0; }
+.response-message .msg-content hr { border: none; border-top: 1px solid #2a2a2a; margin: 12px 0; }
+.response-message .msg-content table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+.response-message .msg-content th, .response-message .msg-content td { border: 1px solid #2a2a2a; padding: 6px 10px; text-align: left; font-size: 13px; }
+.response-message .msg-content th { background: #1a1a1a; }
+
+.blocked-banner { display: flex; align-items: center; gap: 10px; background: rgba(244,67,54,0.12); border: 1px solid rgba(244,67,54,0.3); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+.blocked-banner .blocked-icon { color: #f44336; font-size: 20px; }
+.blocked-banner .blocked-text { color: #f44336; font-size: 14px; font-weight: 600; }
+.blocked-banner .blocked-reason { color: #aaa; font-size: 12px; margin-top: 2px; }
+
+/* ===== Responsive ===== */
+@media (max-width: 1100px) {
+  .left-panel { display: none; }
+}
+@media (max-width: 900px) {
+  .app { flex-direction: column; }
+  .center-panel { width: 100%; min-width: auto; border-right: none; border-bottom: 1px solid #232323; max-height: 55vh; }
+  .right-panel { min-width: auto; }
+}
 </style>
 </head>
 <body>
+
+<!-- ==================== AUTH VIEW ==================== -->
 <div id="auth-view" class="auth-container">
   <div class="auth-card">
-    <h2>SmartChatBot</h2>
+    <h2>AI Security Assistant</h2>
     <div id="auth-error" style="color:#ef4444;font-size:13px;margin-bottom:12px;text-align:center;display:none"></div>
     <input id="auth-username" placeholder="Username" type="text" autocomplete="username">
     <input id="auth-password" placeholder="Password" type="password" autocomplete="current-password">
@@ -102,49 +164,91 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   </div>
 </div>
 
+<!-- ==================== APP VIEW ==================== -->
 <div id="app-view" class="app" style="display:none">
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h1>SmartChatBot</h1>
-      <p>AI Chat with PII Protection</p>
+
+  <!-- Left: Security Logs -->
+  <div class="left-panel">
+    <div class="left-panel-header">
+      <h1>Security Logs</h1>
+      <p>Your security operation history</p>
     </div>
-    <button class="new-chat-btn" onclick="newChat()">+ New Chat</button>
-    <div class="conv-list" id="conv-list"></div>
+    <div class="log-list" id="log-list">
+      <div class="log-empty">No security logs yet</div>
+    </div>
   </div>
-  <div class="main">
-    <div class="chat-header">
+
+  <!-- Center: Input + Security Result -->
+  <div class="center-panel">
+    <div class="center-header">
+      <h2>Security Check</h2>
       <div class="user-info">
         <span id="user-display"></span>
         <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
     </div>
-    <div class="messages" id="messages">
-      <div class="message system">Start a conversation. PII data is automatically redacted before reaching the LLM.</div>
-    </div>
-    <div class="input-area">
-      <div class="input-wrapper">
-        <input id="chat-input" placeholder="Send a message..." onkeydown="if(event.key==='Enter') sendMessage()">
-        <button class="img-upload-btn" onclick="document.getElementById('img-input').click()" title="Upload image">🖼</button>
-        <div class="img-preview" id="img-preview">
-          <img id="preview-img" src="" alt="">
-          <span id="preview-name"></span>
-          <span class="remove-img" onclick="clearImage()">×</span>
-        </div>
-        <input type="file" id="img-input" accept="image/*" style="display:none" onchange="handleImageSelect(event)">
+
+    <div class="input-section">
+      <label>Input Content</label>
+      <textarea id="security-input" class="security-textarea" placeholder="Paste or type content to check..."></textarea>
+      <div class="btn-row">
+        <button id="check-btn" class="btn btn-secondary" onclick="checkSecurity()">Check Security</button>
+        <button id="send-btn" class="btn btn-primary" onclick="sendToAI()" disabled>Send to AI</button>
       </div>
-      <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+
+    <div class="result-section" id="result-section">
+      <!-- Injection Alert -->
+      <div id="injection-alert" class="injection-alert result-hidden">
+        <span class="alert-icon">&#9888;</span>
+        <span id="injection-text">Injection attack detected!</span>
+      </div>
+
+      <!-- Risk Level Card -->
+      <div id="risk-card" class="result-card result-hidden">
+        <h3>Risk Assessment</h3>
+        <div id="risk-badge" class="risk-badge"></div>
+        <div id="pii-section" style="margin-top:14px;">
+          <h3>Detected PII Types</h3>
+          <div id="pii-list" class="pii-list"></div>
+        </div>
+        <div id="preview-section" style="margin-top:14px;">
+          <h3>Sanitized Preview</h3>
+          <div id="sanitized-preview" class="sanitized-preview"></div>
+        </div>
+        <!-- Level 3 decision buttons -->
+        <div id="decision-row" class="decision-row result-hidden">
+          <button class="btn btn-secondary" onclick="sendRedacted()">Send Redacted Version</button>
+          <button class="btn btn-danger" onclick="cancelSend()">Cancel</button>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Right: AI Response -->
+  <div class="right-panel">
+    <div class="right-header">
+      <h2>AI Response</h2>
+      <p>Secure AI assistant replies</p>
+    </div>
+    <div class="response-area" id="response-area">
+      <div class="welcome-msg">Enter content on the left, run a security check, then send to AI.<br>Your data is protected every step of the way.</div>
+    </div>
+  </div>
+
 </div>
 
 <script>
 const API = '';
 let token = localStorage.getItem('token');
 let currentUser = null;
-let currentConvId = null;
 let isRegister = false;
-let selectedImage = null;
 
+// Security check state
+let lastCheckResult = null;
+let currentInput = '';
+
+/* ==================== AUTH ==================== */
 function toggleAuthMode() {
   isRegister = !isRegister;
   document.getElementById('auth-email').style.display = isRegister ? 'block' : 'none';
@@ -202,7 +306,7 @@ function showApp() {
   document.getElementById('auth-view').style.display = 'none';
   document.getElementById('app-view').style.display = 'flex';
   document.getElementById('user-display').textContent = currentUser.username;
-  loadConversations();
+  loadSecurityLogs();
 }
 
 function logout() {
@@ -210,45 +314,129 @@ function logout() {
   localStorage.removeItem('token'); localStorage.removeItem('user');
   document.getElementById('app-view').style.display = 'none';
   document.getElementById('auth-view').style.display = 'flex';
+  resetSecurityUI();
 }
 
-function newChat() {
-  currentConvId = null;
-  document.getElementById('messages').innerHTML = '<div class="message system">Start a conversation. PII data is automatically redacted before reaching the LLM.</div>';
-  document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
-  document.getElementById('chat-input').focus();
+/* ==================== SECURITY CHECK ==================== */
+function resetSecurityUI() {
+  lastCheckResult = null;
+  currentInput = '';
+  document.getElementById('security-input').value = '';
+  document.getElementById('send-btn').disabled = true;
+  hideElement('injection-alert');
+  hideElement('risk-card');
+  hideElement('decision-row');
+  document.getElementById('response-area').innerHTML = '<div class="welcome-msg">Enter content on the left, run a security check, then send to AI.<br>Your data is protected every step of the way.</div>';
 }
 
-function handleImageSelect(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    selectedImage = ev.target.result;
-    document.getElementById('preview-img').src = selectedImage;
-    document.getElementById('preview-name').textContent = file.name.length > 20 ? file.name.slice(0,17)+'...' : file.name;
-    document.getElementById('img-preview').classList.add('show');
-  };
-  reader.readAsDataURL(file);
-  e.target.value = '';
+function hideElement(id) {
+  document.getElementById(id).classList.add('result-hidden');
+}
+function showElement(id) {
+  document.getElementById(id).classList.remove('result-hidden');
 }
 
-function clearImage() {
-  selectedImage = null;
-  document.getElementById('img-preview').classList.remove('show');
-}
-
-async function sendMessage() {
-  const input = document.getElementById('chat-input');
+async function checkSecurity() {
+  const input = document.getElementById('security-input');
   const content = input.value.trim();
-  if (!content && !selectedImage) return;
+  if (!content) return;
 
+  currentInput = content;
+  const checkBtn = document.getElementById('check-btn');
+  checkBtn.disabled = true;
+  checkBtn.textContent = 'Checking...';
+
+  try {
+    const res = await fetch(`${API}/api/security-check`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({content}),
+    });
+    if (!res.ok) throw new Error('Security check failed');
+    const data = await res.json();
+    lastCheckResult = data;
+    renderCheckResult(data);
+  } catch (e) {
+    alert('Security check error: ' + e.message);
+  } finally {
+    checkBtn.disabled = false;
+    checkBtn.textContent = 'Check Security';
+  }
+}
+
+function renderCheckResult(data) {
+  // Injection alert
+  if (data.injection_detected) {
+    showElement('injection-alert');
+    document.getElementById('injection-text').textContent =
+      `Injection attack detected! Type: ${data.injection_type || 'Unknown'}`;
+  } else {
+    hideElement('injection-alert');
+  }
+
+  // Risk badge
+  showElement('risk-card');
+  const riskBadge = document.getElementById('risk-badge');
+  riskBadge.className = 'risk-badge level-' + data.risk_level;
+  const riskTexts = {
+    1: 'Safe — No sensitive data detected',
+    2: 'Caution — PII auto-redacted',
+    3: 'Blocked — High-risk data detected'
+  };
+  riskBadge.innerHTML = `<span class="risk-dot"></span>${riskTexts[data.risk_level] || 'Unknown'}`;
+
+  // PII list
+  const piiList = document.getElementById('pii-list');
+  if (data.pii_types && data.pii_types.length > 0) {
+    piiList.innerHTML = data.pii_types.map(t => `<span class="pii-tag">${escapeHtml(t)}</span>`).join('');
+    showElement('pii-section');
+  } else {
+    piiList.innerHTML = '<span style="color:#555;font-size:12px;">None detected</span>';
+  }
+
+  // Sanitized preview
+  const preview = document.getElementById('sanitized-preview');
+  if (data.sanitized_preview !== undefined && data.sanitized_preview !== null) {
+    preview.textContent = data.sanitized_preview;
+    showElement('preview-section');
+  } else {
+    preview.textContent = '(No preview available)';
+  }
+
+  // Decision buttons for level 3
+  const decisionRow = document.getElementById('decision-row');
+  if (data.risk_level === 3) {
+    showElement('decision-row');
+    document.getElementById('send-btn').disabled = true;
+  } else {
+    hideElement('decision-row');
+    document.getElementById('send-btn').disabled = false;
+  }
+}
+
+/* ==================== SEND TO AI ==================== */
+async function sendToAI() {
+  if (!currentInput) return;
+  await doSend(currentInput, false);
+}
+
+async function sendRedacted() {
+  if (!lastCheckResult || !lastCheckResult.sanitized_preview) return;
+  await doSend(lastCheckResult.sanitized_preview, true);
+}
+
+function cancelSend() {
+  hideElement('decision-row');
+  document.getElementById('send-btn').disabled = false;
+}
+
+async function doSend(content, isRedacted) {
   const sendBtn = document.getElementById('send-btn');
   sendBtn.disabled = true;
-
-  const userContent = content || '[Image]';
-  addMessage('user', userContent, selectedImage);
-  input.value = '';
+  sendBtn.textContent = 'Sending...';
 
   try {
     const res = await fetch(`${API}/api/chat`, {
@@ -257,125 +445,152 @@ async function sendMessage() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        conversation_id: currentConvId,
-        content: userContent,
-        image_data: selectedImage || null,
-      }),
+      body: JSON.stringify({content}),
     });
     if (!res.ok) throw new Error('Failed to send message');
     const data = await res.json();
 
-    currentConvId = data.conversation_id;
-    loadConversations();
-    clearImage();
+    // Show user message
+    addResponseMessage('user-msg', 'Your Input', escapeHtml(content));
 
-    if (data.pii_redacted) {
-      addMessage('system', `🔒 PII redacted: ${data.pii_types.join(', ')}`);
-    }
-
-    if (data.llm_enabled && data.llm_reply) {
-      addMessage('assistant', data.llm_reply);
-    } else if (data.llm_enabled && !data.llm_reply) {
-      addMessage('system', 'LLM is enabled but no response was generated (check API key).');
+    if (data.blocked) {
+      // Blocked
+      const blockedDiv = document.createElement('div');
+      blockedDiv.className = 'blocked-banner';
+      blockedDiv.innerHTML = `
+        <span class="blocked-icon">&#128683;</span>
+        <div>
+          <div class="blocked-text">Message Blocked</div>
+          <div class="blocked-reason">${escapeHtml(data.reason || 'High-risk content detected')}</div>
+        </div>
+      `;
+      document.getElementById('response-area').appendChild(blockedDiv);
     } else {
-      addMessage('system', 'LLM is not configured. Set DEEPSEEK_API_KEY to enable.');
+      // AI response
+      const reply = data.llm_reply || data.reply || data.message || 'No response';
+      addResponseMessage('ai-msg', 'AI Response', simpleMarkdown(reply));
     }
+
+    // Refresh logs
+    loadSecurityLogs();
   } catch (e) {
-    addMessage('system', `Error: ${e.message}`);
+    addResponseMessage('blocked-msg', 'Error', escapeHtml(e.message));
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Send to AI';
   }
-  sendBtn.disabled = false;
 }
 
-function addMessage(role, content, imgData) {
-  const container = document.getElementById('messages');
+function addResponseMessage(cssClass, label, htmlContent) {
+  const area = document.getElementById('response-area');
+  // Remove welcome message if present
+  if (area.querySelector('.welcome-msg')) {
+    area.innerHTML = '';
+  }
   const div = document.createElement('div');
-  div.className = `message ${role}`;
-  let html = content;
-  if (imgData) html += `<img class="msg-img" src="${imgData}" alt="uploaded image">`;
-  div.innerHTML = `${html}<div class="meta">${role === 'user' ? 'You' : role === 'assistant' ? 'AI' : 'System'}</div>`;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
+  div.className = 'response-message ' + cssClass;
+  div.innerHTML = `<div class="msg-label">${label}</div><div class="msg-content">${htmlContent}</div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
 }
 
-async function loadConversations() {
+/* ==================== SECURITY LOGS ==================== */
+async function loadSecurityLogs() {
   try {
-    const res = await fetch(`${API}/api/conversations`, {
+    const res = await fetch(`${API}/api/security-logs`, {
       headers: {'Authorization': `Bearer ${token}`},
     });
-    if (!res.ok) throw new Error('Failed to load');
-    const convs = await res.json();
-    const list = document.getElementById('conv-list');
-    list.innerHTML = convs.length ? '' : '<div style="text-align:center;padding:30px;color:#555;font-size:13px">No conversations yet</div>';
-    convs.forEach(c => {
-      const div = document.createElement('div');
-      div.className = `conv-item ${c.id === currentConvId ? 'active' : ''}`;
-      const title = document.createElement('span');
-      title.className = 'conv-title';
-      title.textContent = c.title || `Conversation ${c.id}`;
-      title.onclick = () => loadConversation(c.id);
-      div.appendChild(title);
-      const delBtn = document.createElement('button');
-      delBtn.className = 'del-btn'; delBtn.textContent = '×';
-      delBtn.title = 'Delete conversation';
-      delBtn.onclick = async (e) => {
-        e.stopPropagation();
-        if (!confirm('Delete this conversation?')) return;
-        try {
-          const res = await fetch(`${API}/api/conversations/${c.id}`, {
-            method: 'DELETE',
-            headers: {'Authorization': `Bearer ${token}`},
-          });
-          if (!res.ok) throw new Error('Delete failed');
-          if (currentConvId === c.id) { currentConvId = null; newChat(); }
-          loadConversations();
-        } catch (e) { alert('Failed to delete: ' + e.message); }
-      };
-      div.appendChild(delBtn);
-      list.appendChild(div);
-    });
-  } catch (e) {}
-}
-
-async function loadConversation(convId) {
-  currentConvId = convId;
-  document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
-  const items = document.getElementById('conv-list').children;
-  for (const el of items) {
-    if (el.__convId === convId || el.textContent.includes(convId)) {
-      el.classList.add('active'); break;
-    }
+    if (!res.ok) throw new Error('Failed to load logs');
+    const logs = await res.json();
+    renderLogs(logs);
+  } catch (e) {
+    // Silently fail or show minimal error
+    const list = document.getElementById('log-list');
+    list.innerHTML = '<div class="log-empty">Failed to load logs</div>';
   }
-  try {
-    const res = await fetch(`${API}/api/conversations/${convId}/messages`, {
-      headers: {'Authorization': `Bearer ${token}`},
-    });
-    if (!res.ok) throw new Error('Failed to load');
-    const msgs = await res.json();
-    const container = document.getElementById('messages');
-    container.innerHTML = '';
-    msgs.forEach(m => {
-      let displayContent = m.raw_content;
-      if (m.role === 'user' && m.pii_redacted) {
-        displayContent = `${m.sanitized_content} <span class="pii-tag">PII Redacted</span>`;
-      }
-      addMessage(m.role, displayContent, m.image_data || null);
-    });
-    container.scrollTop = container.scrollHeight;
-  } catch (e) {}
 }
 
-function updateActiveConv() {
-  document.querySelectorAll('.conv-item').forEach(el => {
-    el.classList.toggle('active', el.__convId === currentConvId);
+function renderLogs(logs) {
+  const list = document.getElementById('log-list');
+  if (!logs || logs.length === 0) {
+    list.innerHTML = '<div class="log-empty">No security logs yet</div>';
+    return;
+  }
+  list.innerHTML = '';
+  logs.slice().reverse().forEach(log => {
+    const item = document.createElement('div');
+    item.className = 'log-item';
+    const level = log.risk_level || 1;
+    const actionClass = log.action === 'block' ? 'action-block' : log.action === 'redact' ? 'action-redact' : 'action-send';
+    const actionText = log.action === 'block' ? 'Blocked' : log.action === 'redact' ? 'Redacted' : 'Sent';
+    const timeStr = log.created_at ? formatTime(log.created_at) : '—';
+    item.innerHTML = `
+      <div class="log-dot level-${level}"></div>
+      <div class="log-body">
+        <div class="log-time">${escapeHtml(timeStr)}</div>
+        <div class="log-action"><span class="${actionClass}">${actionText}</span> — ${escapeHtml(log.operation_type || 'send')}</div>
+      </div>
+    `;
+    list.appendChild(item);
   });
 }
 
+function formatTime(iso) {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString('zh-CN', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+  } catch (e) { return iso; }
+}
+
+/* ==================== UTILS ==================== */
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function simpleMarkdown(text) {
+  if (!text) return '';
+  let html = escapeHtml(text);
+
+  // Code blocks
+  html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Bold
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Italic
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // Headers
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  // Blockquote
+  html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+  // Unordered list
+  html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.+<\/li>\n?)+/g, '<ul>$&</ul>');
+  // Ordered list
+  html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  // Horizontal rule
+  html = html.replace(/^---$/gm, '<hr>');
+  // Links
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  // Line breaks
+  html = html.replace(/\n/g, '<br>');
+
+  return html;
+}
+
+/* ==================== INIT ==================== */
 document.addEventListener('DOMContentLoaded', () => {
   const savedToken = localStorage.getItem('token');
   const savedUser = localStorage.getItem('user');
   if (savedToken && savedUser) {
-    token = savedToken; currentUser = JSON.parse(savedUser); showApp();
+    token = savedToken;
+    currentUser = JSON.parse(savedUser);
+    showApp();
   }
 });
 </script>

@@ -15,3 +15,8 @@ DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
 LLM_ENABLED = bool(DEEPSEEK_API_KEY)
+
+RATE_LIMIT_PER_USER = int(os.getenv("RATE_LIMIT_PER_USER", "60"))
+RATE_LIMIT_PER_IP = int(os.getenv("RATE_LIMIT_PER_IP", "100"))
+RATE_LIMIT_WINDOW = int(os.getenv("RATE_LIMIT_WINDOW", "60"))
+INJECTION_DETECTION_ENABLED = os.getenv("INJECTION_DETECTION_ENABLED", "true").lower() == "true"

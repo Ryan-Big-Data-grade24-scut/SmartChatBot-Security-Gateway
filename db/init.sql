@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS messages (
     pii_redacted BOOLEAN DEFAULT FALSE,
     pii_types_redacted TEXT[],
     image_data TEXT,
+    risk_level INTEGER DEFAULT 1,
+    processing_strategy VARCHAR(16) DEFAULT 'direct',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -43,6 +45,9 @@ CREATE TABLE IF NOT EXISTS audit_log (
     record_id INTEGER,
     detail TEXT,
     ip_address VARCHAR(45),
+    risk_level INTEGER,
+    pii_types_detected TEXT[],
+    processing_strategy VARCHAR(16),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -61,3 +66,5 @@ GRANT SELECT, INSERT ON audit_log TO chatbot_role;
 
 CREATE USER audit_viewer WITH PASSWORD 'AuditView@2024';
 GRANT SELECT ON audit_log TO audit_viewer;
+
+-- Security logs extension for AISA
