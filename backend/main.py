@@ -7,9 +7,8 @@ from database import get_cursor
 from pii_redactor import detect_and_redact
 from injection_detector import detect_injection
 from audit import log_action
-from llm import chat_with_llm, build_conversation_context
+from llm import chat_with_llm, build_conversation_context, is_llm_enabled, get_current_model_info
 from config import (
-    LLM_ENABLED,
     INJECTION_DETECTION_ENABLED,
     RATE_LIMIT_PER_USER,
     RATE_LIMIT_PER_IP,
@@ -180,8 +179,9 @@ def chat(
             "sanitized_content": sanitized_content,
             "conversation_id": conv_id,
             "message_id": msg_id,
-            "processing_strategy": processing_strategy,
-        }
+        "processing_strategy": processing_strategy,
+        "model_info": get_current_model_info(),
+    }
 
     if risk_level == 2:
         processing_strategy = "redacted"
@@ -208,7 +208,7 @@ def chat(
             (
                 conv_id,
                 raw_content,
-                sanitized_content,
+                sanitized_content if risk_level == 2 else None,
                 bool(pii_types),
                 pii_types if pii_types else None,
                 req.image_data,
@@ -232,7 +232,7 @@ def chat(
     )
 
     llm_reply = None
-    if LLM_ENABLED:
+    if is_llm_enabled():
         context = build_conversation_context(conv_id)
         if req.image_data:
             context.append({"role": "user", "content": "[User attached an image]"})
@@ -264,9 +264,10 @@ def chat(
         "pii_redacted": bool(pii_types),
         "pii_types": pii_types,
         "llm_reply": llm_reply,
-        "llm_enabled": LLM_ENABLED,
+        "llm_enabled": is_llm_enabled(),
         "risk_level": risk_level,
         "processing_strategy": processing_strategy,
+        "model_info": get_current_model_info(),
     }
 
 
@@ -376,6 +377,126 @@ def get_security_logs(user: dict = Depends(get_current_user)):
                 for r in rows
             ]
         }
+
+
+# ==================== API Config Management ====================
+
+class ApiConfigRequest(BaseModel):
+    name: str
+    base_url: str = "https://api.deepseek.com/v1"
+    api_key: str = ""
+    model: str = "deepseek-v4-flash"
+
+class ApiConfigActivateRequest(BaseModel):
+    id: int
+
+
+@app.get("/api/configs")
+def list_configs(user: dict = Depends(get_current_user)):
+    with get_cursor() as cur:
+        cur.execute("SELECT id, name, base_url, model, is_active, created_at FROM api_configs ORDER BY id")
+        rows = cur.fetchall()
+        return [
+            {"id": r[0], "name": r[1], "base_url": r[2], "model": r[3], "is_active": r[4], "created_at": r[5].isoformat()}
+            for r in rows
+        ]
+
+
+@app.get("/api/configs/active")
+def get_active_config(user: dict = Depends(get_current_user)):
+    with get_cursor() as cur:
+        cur.execute("SELECT id, name, base_url, api_key, model FROM api_configs WHERE is_active = true LIMIT 1")
+        row = cur.fetchone()
+        if not row:
+            return {"id": None, "name": "", "base_url": "", "model": "", "api_key": "", "has_key": False}
+        return {"id": row[0], "name": row[1], "base_url": row[2], "model": row[4], "api_key": row[3][:8] + "****" if row[3] else "", "has_key": bool(row[3])}
+
+
+@app.post("/api/configs")
+def create_config(req: ApiConfigRequest, user: dict = Depends(get_current_user)):
+    with get_cursor() as cur:
+        cur.execute(
+            "INSERT INTO api_configs (name, base_url, api_key, model) VALUES (%s, %s, %s, %s) RETURNING id",
+            (req.name, req.base_url, req.api_key, req.model),
+        )
+        return {"id": cur.fetchone()[0]}
+
+
+@app.put("/api/configs/{config_id}")
+def update_config(config_id: int, req: ApiConfigRequest, user: dict = Depends(get_current_user)):
+    with get_cursor() as cur:
+        cur.execute(
+            "UPDATE api_configs SET name=%s, base_url=%s, api_key=%s, model=%s WHERE id=%s",
+            (req.name, req.base_url, req.api_key, req.model, config_id),
+        )
+        if cur.rowcount == 0:
+            raise HTTPException(404, "Config not found")
+        return {"message": "Updated"}
+
+
+@app.delete("/api/configs/{config_id}")
+def delete_config(config_id: int, user: dict = Depends(get_current_user)):
+    with get_cursor() as cur:
+        cur.execute("DELETE FROM api_configs WHERE id=%s", (config_id,))
+        return {"message": "Deleted"}
+
+
+@app.post("/api/configs/{config_id}/activate")
+def activate_config(config_id: int, user: dict = Depends(get_current_user)):
+    with get_cursor() as cur:
+        cur.execute("UPDATE api_configs SET is_active=false")
+        cur.execute("UPDATE api_configs SET is_active=true WHERE id=%s", (config_id,))
+        if cur.rowcount == 0:
+            raise HTTPException(404, "Config not found")
+        return {"message": "Activated"}
+
+
+# ==================== Custom PII Management ====================
+
+class CustomPiiRequest(BaseModel):
+    name: str
+    pattern: str
+    risk_level: int = 2
+
+
+@app.get("/api/custom-pii")
+def list_custom_pii(user: dict = Depends(get_current_user)):
+    with get_cursor() as cur:
+        cur.execute("SELECT id, name, pattern, risk_level, created_at FROM custom_pii ORDER BY id")
+        rows = cur.fetchall()
+        return [
+            {"id": r[0], "name": r[1], "pattern": r[2], "risk_level": r[3], "created_at": r[4].isoformat()}
+            for r in rows
+        ]
+
+
+@app.post("/api/custom-pii")
+def create_custom_pii(req: CustomPiiRequest, user: dict = Depends(get_current_user)):
+    with get_cursor() as cur:
+        cur.execute(
+            "INSERT INTO custom_pii (name, pattern, risk_level) VALUES (%s, %s, %s) RETURNING id",
+            (req.name, req.pattern, req.risk_level),
+        )
+        return {"id": cur.fetchone()[0]}
+
+
+@app.put("/api/custom-pii/{pii_id}")
+def update_custom_pii(pii_id: int, req: CustomPiiRequest, user: dict = Depends(get_current_user)):
+    with get_cursor() as cur:
+        cur.execute(
+            "UPDATE custom_pii SET name=%s, pattern=%s, risk_level=%s WHERE id=%s",
+            (req.name, req.pattern, req.risk_level, pii_id),
+        )
+        if cur.rowcount == 0:
+            raise HTTPException(404, "Custom PII not found")
+        return {"message": "Updated"}
+
+
+@app.delete("/api/custom-pii/{pii_id}")
+def delete_custom_pii(pii_id: int, user: dict = Depends(get_current_user)):
+    with get_cursor() as cur:
+        cur.execute("DELETE FROM custom_pii WHERE id=%s", (pii_id,))
+        return {"message": "Deleted"}
 
 
 @app.get("/api/health")

@@ -5,150 +5,235 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Security Assistant</title>
 <style>
+:root {
+  --bg: #0d0d0d;
+  --bg2: #141414;
+  --bg3: #1a1a1a;
+  --border: #232323;
+  --border2: #2a2a2a;
+  --text: #e8e8ea;
+  --text2: #aaa;
+  --text3: #666;
+  --text4: #555;
+  --msg-user-bg: linear-gradient(135deg, #1a5276, #1a3a5c);
+  --msg-ai-bg: #1a1a1a;
+  --msg-ai-border: #2a2a2a;
+  --input-bg: #1a1a1a;
+  --input-border: #2a2a2a;
+  --hover: #1e1e1e;
+  --active: #1a2a3a;
+  --shadow: rgba(0,0,0,0.3);
+}
+.light {
+  --bg: #f0f0f0;
+  --bg2: #ffffff;
+  --bg3: #f5f5f5;
+  --border: #e0e0e0;
+  --border2: #d0d0d0;
+  --text: #1a1a1a;
+  --text2: #555;
+  --text3: #888;
+  --text4: #aaa;
+  --msg-user-bg: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  --msg-ai-bg: #ffffff;
+  --msg-ai-border: #e0e0e0;
+  --input-bg: #ffffff;
+  --input-border: #d0d0d0;
+  --hover: #f0f0f0;
+  --active: #e3f2fd;
+  --shadow: rgba(0,0,0,0.08);
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d0d0d; color: #e8e8ea; height: 100vh; overflow: hidden; }
-.app { display: flex; height: 100vh; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d0d0d; color: var(--text); height: 100vh; overflow: hidden; }
 
 /* ===== Auth ===== */
 .auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; background: #0d0d0d; }
-.auth-card { background: #141414; padding: 40px; border-radius: 16px; width: 380px; border: 1px solid #232323; }
-.auth-card h2 { margin-bottom: 28px; text-align: center; font-size: 24px; background: linear-gradient(135deg, #4fc3f7, #81c784); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.auth-card input { width: 100%; padding: 12px 16px; margin-bottom: 14px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; color: #e8e8ea; font-size: 14px; outline: none; transition: border-color .2s; }
+.auth-card { background: var(--bg2); padding: 40px; border-radius: 16px; width: 380px; border: 1px solid var(--border); }
+.auth-card h2 { margin-bottom: 28px; text-align: center; font-size: 22px; background: linear-gradient(135deg, #4fc3f7, #81c784); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.auth-card input { width: 100%; padding: 12px 16px; margin-bottom: 14px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px; color: var(--text); font-size: 14px; outline: none; transition: border-color .2s; }
 .auth-card input:focus { border-color: #4fc3f7; }
 .auth-card button { width: 100%; padding: 12px; background: #4fc3f7; border: none; border-radius: 10px; color: #0d0d0d; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s; }
 .auth-card button:hover { background: #29b6f6; }
-.auth-card .toggle { text-align: center; margin-top: 16px; font-size: 13px; color: #666; }
+.auth-card .toggle { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text3); }
 .auth-card .toggle a { color: #4fc3f7; cursor: pointer; }
 
-/* ===== Left Panel: Security Logs ===== */
-.left-panel { width: 260px; background: #141414; border-right: 1px solid #232323; display: flex; flex-direction: column; flex-shrink: 0; }
-.left-panel-header { padding: 18px 16px 14px; border-bottom: 1px solid #232323; }
-.left-panel-header h1 { font-size: 16px; font-weight: 700; color: #e8e8ea; }
-.left-panel-header p { font-size: 11px; color: #666; margin-top: 2px; }
-.log-list { flex: 1; overflow-y: auto; padding: 12px; }
-.log-list::-webkit-scrollbar { width: 4px; }
-.log-list::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
-.log-empty { text-align: center; padding: 30px 10px; color: #555; font-size: 12px; }
-.log-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #1e1e1e; }
+/* ===== App Layout ===== */
+.app { display: flex; height: 100vh; }
+
+/* ===== Apply theme to auth page too ===== */
+.light .auth-container { background: #e8e8ea; }
+.light .auth-card { background: #fff; border-color: #d0d0d0; }
+.light .auth-card input { background: #f5f5f5; border-color: #d0d0d0; color: #1a1a1a; }
+.light .auth-card .toggle { color: #888; }
+.light .auth-error { color: #ef4444; }
+.light .sidebar-logs { border-top-color: #d0d0d0; }
+.light .new-chat-btn { border-color: #d0d0d0; }
+.light .new-chat-btn:hover { border-color: #4fc3f7; }
+
+/* ===== Sidebar ===== */
+.sidebar { width: 280px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.sidebar-header h1 { font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #4fc3f7, #81c784); -webkit-background-clip: text; -webkit-text-fill-color: transparent; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.new-chat-btn { margin: 12px 16px; padding: 10px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px; color: var(--text2); cursor: pointer; font-size: 13px; text-align: center; transition: all .2s; }
+.new-chat-btn:hover { border-color: #4fc3f7; color: var(--text); }
+.conv-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
+.conv-list::-webkit-scrollbar { width: 4px; }
+.conv-list::-webkit-scrollbar-thumb { background: var(--text4); border-radius: 2px; }
+.conv-item { padding: 10px 12px; border-radius: 10px; cursor: pointer; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; transition: background .15s; }
+.conv-item:hover { background: var(--hover); }
+.conv-item.active { background: var(--active); }
+.conv-item .conv-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--text2); }
+.conv-item.active .conv-title { color: var(--text); }
+.conv-item .del-btn { display: none; padding: 2px 6px; background: transparent; border: none; color: var(--text4); cursor: pointer; font-size: 14px; border-radius: 4px; }
+.conv-item:hover .del-btn { display: block; }
+.conv-item .del-btn:hover { color: #ef5350; background: rgba(239,83,80,0.1); }
+.list-empty { text-align: center; padding: 30px; color: var(--text4); font-size: 13px; }
+
+/* Sidebar bottom: security logs */
+.sidebar-logs { border-top: 1px solid var(--border); max-height: 200px; display: flex; flex-direction: column; }
+.sidebar-logs .logs-header { padding: 10px 16px; font-size: 11px; color: var(--text4); text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.sidebar-logs .logs-header:hover { color: var(--text3); }
+.sidebar-logs .logs-list { overflow-y: auto; padding: 4px 12px 8px; }
+.sidebar-logs .logs-list::-webkit-scrollbar { width: 3px; }
+.sidebar-logs .logs-list::-webkit-scrollbar-thumb { background: var(--text4); border-radius: 2px; }
+.log-item { display: flex; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--bg3); }
 .log-item:last-child { border-bottom: none; }
-.log-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-.log-dot.level-1 { background: #4caf50; box-shadow: 0 0 6px rgba(76,175,80,0.4); }
-.log-dot.level-2 { background: #ff9800; box-shadow: 0 0 6px rgba(255,152,0,0.4); }
-.log-dot.level-3 { background: #f44336; box-shadow: 0 0 6px rgba(244,67,54,0.4); }
+.log-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.log-dot.l1 { background: #4caf50; }
+.log-dot.l2 { background: #ff9800; }
+.log-dot.l3 { background: #f44336; }
 .log-body { flex: 1; min-width: 0; }
-.log-time { font-size: 11px; color: #666; margin-bottom: 2px; }
-.log-action { font-size: 12px; color: #aaa; }
-.log-action span { font-weight: 600; }
-.log-action .action-send { color: #4caf50; }
-.log-action .action-redact { color: #ff9800; }
-.log-action .action-block { color: #f44336; }
+.log-time { font-size: 10px; color: var(--text4); }
+.log-text { font-size: 11px; color: var(--text3); }
 
-/* ===== Center Panel: Input + Security Result ===== */
-.center-panel { width: 400px; min-width: 320px; background: #0d0d0d; border-right: 1px solid #232323; display: flex; flex-direction: column; flex-shrink: 0; }
-.center-header { padding: 14px 20px; border-bottom: 1px solid #1e1e1e; display: flex; justify-content: space-between; align-items: center; }
-.center-header h2 { font-size: 15px; font-weight: 600; color: #e8e8ea; }
-.center-header .user-info { display: flex; align-items: center; gap: 12px; }
-.center-header .user-info span { font-size: 12px; color: #888; }
-.logout-btn { padding: 5px 12px; background: transparent; border: 1px solid #333; color: #aaa; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all .2s; }
-.logout-btn:hover { border-color: #ef5350; color: #ef5350; }
+/* ===== Main Chat Area ===== */
+.chat-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.chat-header { padding: 14px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg); }
+.chat-header .chat-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.chat-header .chat-title .conv-label { font-size: 11px; color: var(--text4); font-weight: 400; margin-left: 8px; }
+.chat-header .user-info { display: flex; align-items: center; gap: 12px; }
+.chat-header .user-info span { font-size: 13px; color: var(--text3); }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #4fc3f7, #81c784); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #0d0d0d; cursor: pointer; position: relative; }
+.settings-dropdown { position: absolute; top: 42px; right: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; min-width: 200px; box-shadow: 0 8px 24px var(--shadow); display: none; z-index: 100; }
+.settings-dropdown.show { display: block; }
+.settings-dropdown .sd-header { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.settings-dropdown .sd-header .sd-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.settings-dropdown .sd-header .sd-role { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.settings-dropdown .sd-item { padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text2); cursor: pointer; transition: background .15s; }
+.settings-dropdown .sd-item:hover { background: var(--hover); }
+.settings-dropdown .sd-item:last-child { border-radius: 0 0 12px 12px; }
+.settings-dropdown .sd-item.logout-item { border-top: 1px solid var(--border); }
+.settings-dropdown .sd-item.logout-item:hover { color: #ef5350; }
+.toggle-switch { width: 36px; height: 20px; background: var(--text4); border-radius: 10px; position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+.toggle-switch.on { background: #4fc3f7; }
+.toggle-switch .toggle-knob { width: 16px; height: 16px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform .2s; }
+.toggle-switch.on .toggle-knob { transform: translateX(16px); }
 
-.input-section { padding: 20px; border-bottom: 1px solid #1e1e1e; }
-.input-section label { display: block; font-size: 12px; color: #888; margin-bottom: 8px; }
-.security-textarea { width: 100%; min-height: 140px; padding: 12px 14px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; color: #e8e8ea; font-size: 14px; line-height: 1.6; outline: none; resize: vertical; font-family: inherit; transition: border-color .2s; }
-.security-textarea:focus { border-color: #4fc3f7; }
-.btn-row { display: flex; gap: 10px; margin-top: 12px; }
-.btn { padding: 10px 18px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; white-space: nowrap; }
-.btn-primary { background: #4fc3f7; color: #0d0d0d; }
-.btn-primary:hover { background: #29b6f6; }
-.btn-primary:disabled { opacity: .4; cursor: not-allowed; }
-.btn-secondary { background: #1e1e1e; border: 1px solid #333; color: #aaa; }
-.btn-secondary:hover { background: #2a2a2a; border-color: #4fc3f7; color: #e8e8ea; }
-.btn-secondary:disabled { opacity: .4; cursor: not-allowed; }
-.btn-danger { background: #f44336; color: #fff; }
-.btn-danger:hover { background: #d32f2f; }
+/* ===== Messages ===== */
+.messages { flex: 1; overflow-y: auto; padding: 24px 15%; display: flex; flex-direction: column; gap: 12px; background: var(--bg); }
+.messages::-webkit-scrollbar { width: 6px; }
+.messages::-webkit-scrollbar-thumb { background: var(--text4); border-radius: 3px; }
+.msg { max-width: 80%; padding: 14px 18px; border-radius: 16px; font-size: 14px; line-height: 1.7; animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.msg.user { align-self: flex-end; background: var(--msg-user-bg); border-bottom-right-radius: 4px; }
+.msg.ai { align-self: flex-start; background: var(--msg-ai-bg); border: 1px solid var(--msg-ai-border); border-bottom-left-radius: 4px; }
+.msg.system { align-self: center; background: transparent; color: var(--text3); font-size: 12px; padding: 4px 12px; text-align: center; max-width: 90%; }
+.msg.blocked { align-self: center; background: rgba(244,67,54,0.1); border: 1px solid rgba(244,67,54,0.25); border-radius: 12px; padding: 10px 16px; max-width: 90%; }
+.msg .msg-content { word-break: break-word; }
+.msg .msg-content code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #ff9800; }
+.msg .msg-content pre { background: var(--bg3); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 6px 0; }
+.msg .msg-content pre code { background: transparent; padding: 0; }
+.msg .msg-content a { color: #4fc3f7; }
+.msg .msg-content strong { color: var(--text); }
+.msg .msg-content p { margin: 4px 0; }
+.msg .msg-content ul, .msg .msg-content ol { margin: 4px 0 4px 20px; }
+.msg .msg-content blockquote { border-left: 3px solid var(--border2); padding-left: 10px; margin: 4px 0; color: var(--text2); }
+.pii-tag { display: inline-block; background: #f59e0b; color: #0d0d0d; font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-left: 6px; font-weight: 600; }
 
-/* Security Result Area */
-.result-section { flex: 1; overflow-y: auto; padding: 20px; }
-.result-section::-webkit-scrollbar { width: 5px; }
-.result-section::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-.result-hidden { display: none !important; }
+/* ===== Security Preview Bar ===== */
+.sec-bar { display: none; padding: 10px 15%; background: var(--bg); border-top: 1px solid var(--border); }
+.sec-bar.show { display: block; }
+.sec-bar-inner { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sec-bar .risk-l1 { color: #4caf50; }
+.sec-bar .risk-l2 { color: #ff9800; }
+.sec-bar .risk-l3 { color: #f44336; }
+.sec-bar .risk-badge { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.sec-bar .risk-badge .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.sec-bar .risk-badge .dot.g { background: #4caf50; }
+.sec-bar .risk-badge .dot.o { background: #ff9800; }
+.sec-bar .risk-badge .dot.r { background: #f44336; }
+.sec-bar .pii-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.sec-bar .pii-tag-sm { background: rgba(255,152,0,0.15); color: #ff9800; font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+.sec-bar .sec-preview { font-size: 12px; color: var(--text4); flex: 1; min-width: 100px; }
+.sec-bar .sec-preview .redacted { color: #ff9800; font-weight: 600; }
+.sec-bar .sec-actions { display: flex; gap: 6px; }
+.sec-btn { padding: 5px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all .2s; white-space: nowrap; }
 
-.result-card { background: #141414; border: 1px solid #232323; border-radius: 14px; padding: 18px; margin-bottom: 16px; }
-.result-card h3 { font-size: 13px; color: #888; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+/* ===== Input Area ===== */
+.input-area { padding: 12px 15% 20px; background: var(--bg); }
+.input-wrapper { display: flex; align-items: flex-end; gap: 8px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 14px; padding: 4px 4px 4px 16px; transition: border-color .2s; }
+.input-wrapper:focus-within { border-color: #4fc3f7; }
+.input-wrapper textarea { flex: 1; padding: 10px 0; background: transparent; border: none; color: var(--text); font-size: 14px; outline: none; resize: none; font-family: inherit; line-height: 1.5; max-height: 120px; }
+.input-wrapper textarea::placeholder { color: var(--text4); }
+.send-btn { padding: 10px 18px; background: #4fc3f7; border: none; border-radius: 10px; color: #0d0d0d; cursor: pointer; font-size: 13px; font-weight: 600; transition: all .2s; white-space: nowrap; }
+.send-btn:hover { background: #29b6f6; }
+.send-btn:disabled { opacity: .4; cursor: not-allowed; }
+.check-btn { padding: 8px 12px; background: transparent; border: 1px solid var(--border2); color: var(--text3); border-radius: 8px; cursor: pointer; font-size: 11px; transition: all .2s; white-space: nowrap; }
+.check-btn:hover { border-color: #ff9800; color: #ff9800; }
+.model-tag { font-size: 11px; color: var(--text4); margin-left: 8px; background: var(--bg3); padding: 2px 8px; border-radius: 6px; }
+.settings-gear { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 4px; border-radius: 6px; transition: all .2s; line-height: 1; }
+.settings-gear:hover { color: var(--text); background: var(--hover); }
 
-.risk-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 10px; font-size: 14px; font-weight: 600; }
-.risk-badge.level-1 { background: rgba(76,175,80,0.12); color: #4caf50; border: 1px solid rgba(76,175,80,0.3); }
-.risk-badge.level-2 { background: rgba(255,152,0,0.12); color: #ff9800; border: 1px solid rgba(255,152,0,0.3); }
-.risk-badge.level-3 { background: rgba(244,67,54,0.12); color: #f44336; border: 1px solid rgba(244,67,54,0.3); }
-.risk-dot { width: 10px; height: 10px; border-radius: 50%; }
-.risk-badge.level-1 .risk-dot { background: #4caf50; }
-.risk-badge.level-2 .risk-dot { background: #ff9800; }
-.risk-badge.level-3 .risk-dot { background: #f44336; }
+/* Settings Modal */
+.modal-overlay { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,.6); z-index:200; justify-content:center; align-items:center; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--bg2); border:1px solid var(--border); border-radius:16px; width:680px; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 16px 48px var(--shadow); }
+.modal-header { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); }
+.modal-header h2 { font-size:16px; font-weight:700; color:var(--text); }
+.modal-close { background:none; border:none; color:var(--text4); font-size:20px; cursor:pointer; padding:4px 8px; border-radius:6px; }
+.modal-close:hover { color:var(--text); background:var(--hover); }
+.modal-tabs { display:flex; border-bottom:1px solid var(--border); padding:0 20px; }
+.modal-tab { padding:12px 20px; font-size:13px; color:var(--text3); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; }
+.modal-tab:hover { color:var(--text2); }
+.modal-tab.active { color:#4fc3f7; border-bottom-color:#4fc3f7; }
+.modal-body { flex:1; overflow-y:auto; padding:20px; }
+.modal-body::-webkit-scrollbar { width:4px; }
+.modal-body::-webkit-scrollbar-thumb { background:var(--text4); border-radius:2px; }
 
-.pii-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.pii-tag { background: rgba(255,152,0,0.15); color: #ff9800; font-size: 11px; padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(255,152,0,0.25); }
+/* Form fields inside modal */
+.modal .form-group { margin-bottom:12px; }
+.modal .form-group label { display:block; font-size:12px; color:var(--text3); margin-bottom:4px; }
+.modal .form-group input, .modal .form-group select, .modal .form-group textarea { width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-size:13px; outline:none; }
+.modal .form-group input:focus, .modal .form-group select:focus, .modal .form-group textarea:focus { border-color:#4fc3f7; }
+.modal .form-group textarea { font-family:monospace; resize:vertical; min-height:60px; }
+.modal .btn-primary { padding:8px 16px; background:#4fc3f7; border:none; border-radius:8px; color:#0d0d0d; font-size:13px; font-weight:600; cursor:pointer; transition:background .2s; }
+.modal .btn-primary:hover { background:#29b6f6; }
+.modal .btn-sm { padding:4px 10px; font-size:11px; border-radius:6px; }
+.modal .btn-danger { background:#ef5350; color:#fff; }
+.modal .btn-danger:hover { background:#e53935; }
+.modal .btn-outline { background:transparent; border:1px solid var(--border2); color:var(--text2); }
+.modal .btn-outline:hover { border-color:#4fc3f7; color:#4fc3f7; }
 
-.sanitized-preview { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px; font-size: 13px; line-height: 1.6; color: #aaa; white-space: pre-wrap; word-break: break-word; margin-top: 8px; }
-.sanitized-preview .redacted { background: rgba(255,152,0,0.25); color: #ff9800; padding: 1px 4px; border-radius: 4px; font-weight: 600; }
-
-.injection-alert { background: rgba(244,67,54,0.12); border: 1px solid rgba(244,67,54,0.3); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; color: #f44336; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
-.injection-alert .alert-icon { font-size: 16px; }
-
-.decision-row { display: flex; gap: 10px; margin-top: 14px; }
-
-/* ===== Right Panel: AI Response ===== */
-.right-panel { flex: 1; min-width: 300px; background: #0d0d0d; display: flex; flex-direction: column; }
-.right-header { padding: 14px 24px; border-bottom: 1px solid #1e1e1e; }
-.right-header h2 { font-size: 15px; font-weight: 600; color: #e8e8ea; }
-.right-header p { font-size: 11px; color: #666; margin-top: 2px; }
-
-.response-area { flex: 1; overflow-y: auto; padding: 24px 28px; }
-.response-area::-webkit-scrollbar { width: 6px; }
-.response-area::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-
-.welcome-msg { color: #666; font-size: 14px; text-align: center; padding: 60px 20px; }
-
-.response-message { background: #141414; border: 1px solid #232323; border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; animation: fadeIn .25s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-.response-message.user-msg { border-left: 3px solid #4fc3f7; }
-.response-message.ai-msg { border-left: 3px solid #81c784; }
-.response-message.blocked-msg { border-left: 3px solid #f44336; background: rgba(244,67,54,0.06); }
-.response-message .msg-label { font-size: 11px; color: #666; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-.response-message .msg-content { font-size: 14px; line-height: 1.7; color: #e8e8ea; }
-.response-message .msg-content code { background: #1e1e1e; padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #ff9800; }
-.response-message .msg-content pre { background: #1e1e1e; padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
-.response-message .msg-content pre code { background: transparent; padding: 0; }
-.response-message .msg-content blockquote { border-left: 3px solid #333; padding-left: 12px; margin: 8px 0; color: #aaa; }
-.response-message .msg-content ul, .response-message .msg-content ol { margin: 8px 0 8px 20px; }
-.response-message .msg-content a { color: #4fc3f7; }
-.response-message .msg-content strong { color: #fff; }
-.response-message .msg-content em { color: #bbb; }
-.response-message .msg-content h1, .response-message .msg-content h2, .response-message .msg-content h3 { margin: 12px 0 6px; color: #fff; }
-.response-message .msg-content p { margin: 6px 0; }
-.response-message .msg-content hr { border: none; border-top: 1px solid #2a2a2a; margin: 12px 0; }
-.response-message .msg-content table { border-collapse: collapse; width: 100%; margin: 8px 0; }
-.response-message .msg-content th, .response-message .msg-content td { border: 1px solid #2a2a2a; padding: 6px 10px; text-align: left; font-size: 13px; }
-.response-message .msg-content th { background: #1a1a1a; }
-
-.blocked-banner { display: flex; align-items: center; gap: 10px; background: rgba(244,67,54,0.12); border: 1px solid rgba(244,67,54,0.3); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
-.blocked-banner .blocked-icon { color: #f44336; font-size: 20px; }
-.blocked-banner .blocked-text { color: #f44336; font-size: 14px; font-weight: 600; }
-.blocked-banner .blocked-reason { color: #aaa; font-size: 12px; margin-top: 2px; }
-
-/* ===== Responsive ===== */
-@media (max-width: 1100px) {
-  .left-panel { display: none; }
-}
-@media (max-width: 900px) {
-  .app { flex-direction: column; }
-  .center-panel { width: 100%; min-width: auto; border-right: none; border-bottom: 1px solid #232323; max-height: 55vh; }
-  .right-panel { min-width: auto; }
-}
+.api-config-item, .pii-item { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:var(--bg3); border:1px solid var(--border2); border-radius:10px; margin-bottom:8px; transition:border-color .2s; }
+.api-config-item:hover, .pii-item:hover { border-color:var(--border); }
+.api-config-item .info, .pii-item .info { flex:1; min-width:0; }
+.api-config-item .info .name { font-size:13px; font-weight:600; color:var(--text); }
+.api-config-item .info .detail { font-size:11px; color:var(--text3); margin-top:2px; }
+.pii-item .info .name { font-size:13px; font-weight:600; color:var(--text); }
+.pii-item .info .detail { font-size:11px; color:var(--text3); margin-top:2px; }
+.api-config-item .actions, .pii-item .actions { display:flex; gap:4px; flex-shrink:0; }
+.badge-active { display:inline-block; background:#22c55e; color:#0d0d0d; font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; margin-left:6px; }
+.badge-risk { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; margin-left:6px; }
+.badge-risk.r1 { background:#4caf50; color:#fff; }
+.badge-risk.r2 { background:#ff9800; color:#0d0d0d; }
+.badge-risk.r3 { background:#f44336; color:#fff; }
+.modal .add-form { background:var(--bg3); border:1px dashed var(--border2); border-radius:10px; padding:14px; margin-bottom:14px; }
+.modal .add-form.hidden { display:none; }
 </style>
 </head>
 <body>
 
-<!-- ==================== AUTH VIEW ==================== -->
+<!-- ===== AUTH ===== -->
 <div id="auth-view" class="auth-container">
   <div class="auth-card">
     <h2>AI Security Assistant</h2>
@@ -164,78 +249,155 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   </div>
 </div>
 
-<!-- ==================== APP VIEW ==================== -->
+<!-- ===== APP ===== -->
 <div id="app-view" class="app" style="display:none">
 
-  <!-- Left: Security Logs -->
-  <div class="left-panel">
-    <div class="left-panel-header">
-      <h1>Security Logs</h1>
-      <p>Your security operation history</p>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1>AI Security Assistant</h1>
     </div>
-    <div class="log-list" id="log-list">
-      <div class="log-empty">No security logs yet</div>
+    <button class="new-chat-btn" onclick="newChat()">+ New Chat</button>
+    <div class="conv-list" id="conv-list">
+      <div class="list-empty">No conversations yet</div>
+    </div>
+    <div class="sidebar-logs" id="sidebar-logs">
+      <div class="logs-header" onclick="toggleLogs()">Security Logs <span id="logs-toggle">▼</span></div>
+      <div class="logs-list" id="logs-list" style="display:none">
+        <div class="list-empty" style="padding:15px">No logs yet</div>
+      </div>
     </div>
   </div>
 
-  <!-- Center: Input + Security Result -->
-  <div class="center-panel">
-    <div class="center-header">
-      <h2>Security Check</h2>
+  <!-- Chat Main -->
+  <div class="chat-main">
+    <div class="chat-header">
+      <div class="chat-title">
+        <span id="chat-title">SmartChatBot</span>
+        <span class="conv-label" id="conv-label"></span>
+        <span class="model-tag" id="model-tag"></span>
+      </div>
       <div class="user-info">
-        <span id="user-display"></span>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+        <button class="settings-gear" id="settings-gear" onclick="openSettings()" title="Settings">⚙️</button>
+        <div class="user-avatar" id="avatar-btn" onclick="toggleSettings()">
+          <span id="avatar-letter">U</span>
+          <div class="settings-dropdown" id="settings-dropdown" onclick="event.stopPropagation()">
+            <div class="sd-header">
+              <div class="sd-name" id="sd-name">User</div>
+              <div class="sd-role">Authenticated</div>
+            </div>
+            <div class="sd-item">
+              <span>Theme</span>
+              <div class="toggle-switch" id="theme-toggle" onclick="toggleTheme(event)">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
+            <div class="sd-item logout-item" onclick="logout()">Sign Out</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="input-section">
-      <label>Input Content</label>
-      <textarea id="security-input" class="security-textarea" placeholder="Paste or type content to check..."></textarea>
-      <div class="btn-row">
-        <button id="check-btn" class="btn btn-secondary" onclick="checkSecurity()">Check Security</button>
-        <button id="send-btn" class="btn btn-primary" onclick="sendToAI()" disabled>Send to AI</button>
+    <div class="messages" id="messages">
+      <div class="msg system">Start a conversation — security checks run automatically on every message.</div>
+    </div>
+
+    <!-- Security Preview Bar -->
+    <div class="sec-bar" id="sec-bar">
+      <div class="sec-bar-inner">
+        <div class="risk-badge" id="sec-risk"></div>
+        <div class="pii-tags" id="sec-pii"></div>
+        <div class="sec-preview" id="sec-preview"></div>
+        <div class="sec-actions" id="sec-actions">
+          <button class="sec-btn" style="background:#ff9800;color:#0d0d0d;display:none" id="sec-send-redacted" onclick="sendRedacted()">Send Redacted</button>
+          <button class="sec-btn" style="background:#f44336;color:#fff;display:none" id="sec-cancel" onclick="hideSecBar()">Cancel</button>
+        </div>
       </div>
     </div>
 
-    <div class="result-section" id="result-section">
-      <!-- Injection Alert -->
-      <div id="injection-alert" class="injection-alert result-hidden">
-        <span class="alert-icon">&#9888;</span>
-        <span id="injection-text">Injection attack detected!</span>
-      </div>
-
-      <!-- Risk Level Card -->
-      <div id="risk-card" class="result-card result-hidden">
-        <h3>Risk Assessment</h3>
-        <div id="risk-badge" class="risk-badge"></div>
-        <div id="pii-section" style="margin-top:14px;">
-          <h3>Detected PII Types</h3>
-          <div id="pii-list" class="pii-list"></div>
-        </div>
-        <div id="preview-section" style="margin-top:14px;">
-          <h3>Sanitized Preview</h3>
-          <div id="sanitized-preview" class="sanitized-preview"></div>
-        </div>
-        <!-- Level 3 decision buttons -->
-        <div id="decision-row" class="decision-row result-hidden">
-          <button class="btn btn-secondary" onclick="sendRedacted()">Send Redacted Version</button>
-          <button class="btn btn-danger" onclick="cancelSend()">Cancel</button>
-        </div>
+    <!-- Input Area -->
+    <div class="input-area">
+      <div class="input-wrapper">
+        <textarea id="chat-input" placeholder="Send a message..." rows="1" oninput="autoResize(this)"></textarea>
+        <button class="check-btn" id="check-btn" onclick="checkSecurity()">🔍 Check</button>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
       </div>
     </div>
   </div>
 
-  <!-- Right: AI Response -->
-  <div class="right-panel">
-    <div class="right-header">
-      <h2>AI Response</h2>
-      <p>Secure AI assistant replies</p>
+</div>
+
+<!-- ===== SETTINGS MODAL ===== -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Settings</h2>
+      <button class="modal-close" onclick="closeSettings()">×</button>
     </div>
-    <div class="response-area" id="response-area">
-      <div class="welcome-msg">Enter content on the left, run a security check, then send to AI.<br>Your data is protected every step of the way.</div>
+    <div class="modal-tabs">
+      <div class="modal-tab active" data-tab="api-config" onclick="switchSettingTab('api-config')">API Configuration</div>
+      <div class="modal-tab" data-tab="custom-pii" onclick="switchSettingTab('custom-pii')">Custom PII Rules</div>
+    </div>
+    <div class="modal-body" id="settings-body">
+
+      <!-- API Config Tab -->
+      <div id="tab-api-config">
+        <button class="btn-primary btn-sm" onclick="showApiConfigForm()">+ Add Config</button>
+        <div class="add-form hidden" id="api-config-form">
+          <div class="form-group">
+            <label>Name</label>
+            <input id="ac-name" placeholder="e.g. DeepSeek Official">
+          </div>
+          <div class="form-group">
+            <label>Base URL</label>
+            <input id="ac-base-url" placeholder="https://api.deepseek.com/v1">
+          </div>
+          <div class="form-group">
+            <label>API Key</label>
+            <input id="ac-api-key" placeholder="sk-..." type="password">
+          </div>
+          <div class="form-group">
+            <label>Model</label>
+            <input id="ac-model" placeholder="deepseek-v4-flash">
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn-primary btn-sm" id="ac-save-btn" onclick="saveApiConfig()">Save</button>
+            <button class="btn-outline btn-sm" onclick="hideApiConfigForm()">Cancel</button>
+          </div>
+        </div>
+        <div id="api-config-list"></div>
+      </div>
+
+      <!-- Custom PII Tab -->
+      <div id="tab-custom-pii" style="display:none">
+        <button class="btn-primary btn-sm" onclick="showPiiForm()">+ Add Rule</button>
+        <div class="add-form hidden" id="pii-form">
+          <div class="form-group">
+            <label>Name</label>
+            <input id="pii-name" placeholder="e.g. Internal Employee ID">
+          </div>
+          <div class="form-group">
+            <label>Regex Pattern</label>
+            <textarea id="pii-pattern" placeholder="e.g. EMP\d{6}"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Risk Level</label>
+            <select id="pii-risk">
+              <option value="1">1 - Low (pass through)</option>
+              <option value="2" selected>2 - Medium (redact)</option>
+              <option value="3">3 - High (block)</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn-primary btn-sm" id="pii-save-btn" onclick="saveCustomPii()">Save</button>
+            <button class="btn-outline btn-sm" onclick="hidePiiForm()">Cancel</button>
+          </div>
+        </div>
+        <div id="custom-pii-list"></div>
+      </div>
+
     </div>
   </div>
-
 </div>
 
 <script>
@@ -243,10 +405,8 @@ const API = '';
 let token = localStorage.getItem('token');
 let currentUser = null;
 let isRegister = false;
-
-// Security check state
+let currentConvId = null;
 let lastCheckResult = null;
-let currentInput = '';
 
 /* ==================== AUTH ==================== */
 function toggleAuthMode() {
@@ -263,12 +423,10 @@ async function handleAuth() {
   const email = document.getElementById('auth-email').value;
   const errorEl = document.getElementById('auth-error');
   errorEl.style.display = 'none';
-
   try {
     if (isRegister) {
       const res = await fetch(`${API}/api/register`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({username, password, email: email || null}),
       });
       if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Registration failed'); }
@@ -282,10 +440,8 @@ async function handleAuth() {
       errorEl.style.display = 'block';
       return;
     }
-
     const res = await fetch(`${API}/api/login`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({username, password}),
     });
     if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Login failed'); }
@@ -302,11 +458,20 @@ async function handleAuth() {
   }
 }
 
+/* ==================== APP ==================== */
 function showApp() {
   document.getElementById('auth-view').style.display = 'none';
   document.getElementById('app-view').style.display = 'flex';
-  document.getElementById('user-display').textContent = currentUser.username;
-  loadSecurityLogs();
+  document.getElementById('avatar-letter').textContent = currentUser.username.charAt(0).toUpperCase();
+  document.getElementById('sd-name').textContent = currentUser.username;
+  loadConversations();
+  loadLogs();
+  loadModelInfo();
+  // Apply saved theme
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('theme-toggle').classList.add('on');
+  }
 }
 
 function logout() {
@@ -314,272 +479,518 @@ function logout() {
   localStorage.removeItem('token'); localStorage.removeItem('user');
   document.getElementById('app-view').style.display = 'none';
   document.getElementById('auth-view').style.display = 'flex';
-  resetSecurityUI();
 }
 
-/* ==================== SECURITY CHECK ==================== */
-function resetSecurityUI() {
-  lastCheckResult = null;
-  currentInput = '';
-  document.getElementById('security-input').value = '';
-  document.getElementById('send-btn').disabled = true;
-  hideElement('injection-alert');
-  hideElement('risk-card');
-  hideElement('decision-row');
-  document.getElementById('response-area').innerHTML = '<div class="welcome-msg">Enter content on the left, run a security check, then send to AI.<br>Your data is protected every step of the way.</div>';
+/* ==================== CONVERSATIONS ==================== */
+async function loadConversations() {
+  try {
+    const res = await fetch(`${API}/api/conversations`, {headers: {'Authorization': `Bearer ${token}`}});
+    if (!res.ok) return;
+    const convs = await res.json();
+    const list = document.getElementById('conv-list');
+    if (!convs || convs.length === 0) {
+      list.innerHTML = '<div class="list-empty">No conversations yet</div>';
+      return;
+    }
+    list.innerHTML = '';
+    convs.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'conv-item' + (c.id === currentConvId ? ' active' : '');
+      div.dataset.convId = c.id;
+      const title = document.createElement('span');
+      title.className = 'conv-title';
+      title.textContent = c.title || `Conversation ${c.id}`;
+      title.onclick = () => selectConversation(c.id);
+      div.appendChild(title);
+      const del = document.createElement('button');
+      del.className = 'del-btn'; del.textContent = '×';
+      del.onclick = async e => {
+        e.stopPropagation();
+        if (!confirm('Delete?')) return;
+        await fetch(`${API}/api/conversations/${c.id}`, {method:'DELETE', headers:{'Authorization':`Bearer ${token}`}});
+        if (currentConvId === c.id) currentConvId = null;
+        loadConversations(); loadLogs();
+      };
+      div.appendChild(del);
+      list.appendChild(div);
+    });
+  } catch (e) {}
 }
 
-function hideElement(id) {
-  document.getElementById(id).classList.add('result-hidden');
-}
-function showElement(id) {
-  document.getElementById(id).classList.remove('result-hidden');
+function selectConversation(convId) {
+  currentConvId = convId;
+  document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('conv-list').querySelectorAll('.conv-item').forEach(el => {
+    if (parseInt(el.dataset.convId) === convId) {
+      el.classList.add('active');
+      document.getElementById('chat-title').textContent = el.querySelector('.conv-title').textContent;
+    }
+  });
+  document.getElementById('conv-label').textContent = `(#${convId})`;
+  loadMessages(convId);
 }
 
-async function checkSecurity() {
-  const input = document.getElementById('security-input');
+async function loadMessages(convId) {
+  try {
+    const res = await fetch(`${API}/api/conversations/${convId}/messages`, {headers: {'Authorization': `Bearer ${token}`}});
+    if (!res.ok) return;
+    const msgs = await res.json();
+    const container = document.getElementById('messages');
+    container.innerHTML = '';
+    msgs.forEach(m => {
+      if (m.role === 'user') {
+        const displayContent = m.pii_redacted && m.sanitized_content
+          ? escapeHtml(m.sanitized_content) + ' <span class="pii-tag">PII Redacted</span>'
+          : escapeHtml(m.raw_content || '');
+        addMessage('user', displayContent);
+      } else if (m.role === 'assistant') {
+        addMessage('ai', simpleMarkdown(m.raw_content || ''));
+      } else {
+        addMessage('system', m.raw_content || '');
+      }
+    });
+    container.scrollTop = container.scrollHeight;
+  } catch (e) {}
+}
+
+function newChat() {
+  currentConvId = null;
+  document.getElementById('chat-title').textContent = 'SmartChatBot';
+  document.getElementById('conv-label').textContent = '';
+  document.getElementById('messages').innerHTML = '<div class="msg system">Start a conversation — security checks run automatically on every message.</div>';
+  document.getElementById('chat-input').value = '';
+  document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
+  hideSecBar();
+  document.getElementById('chat-input').focus();
+}
+
+/* ==================== SEND MESSAGE ==================== */
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
   const content = input.value.trim();
   if (!content) return;
 
-  currentInput = content;
-  const checkBtn = document.getElementById('check-btn');
-  checkBtn.disabled = true;
-  checkBtn.textContent = 'Checking...';
-
-  try {
-    const res = await fetch(`${API}/api/security-check`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({content}),
-    });
-    if (!res.ok) throw new Error('Security check failed');
-    const data = await res.json();
-    lastCheckResult = data;
-    renderCheckResult(data);
-  } catch (e) {
-    alert('Security check error: ' + e.message);
-  } finally {
-    checkBtn.disabled = false;
-    checkBtn.textContent = 'Check Security';
-  }
-}
-
-function renderCheckResult(data) {
-  // Injection alert
-  if (data.injection_detected) {
-    showElement('injection-alert');
-    document.getElementById('injection-text').textContent =
-      `Injection attack detected! Type: ${data.injection_type || 'Unknown'}`;
-  } else {
-    hideElement('injection-alert');
-  }
-
-  // Risk badge
-  showElement('risk-card');
-  const riskBadge = document.getElementById('risk-badge');
-  riskBadge.className = 'risk-badge level-' + data.risk_level;
-  const riskTexts = {
-    1: 'Safe — No sensitive data detected',
-    2: 'Caution — PII auto-redacted',
-    3: 'Blocked — High-risk data detected'
-  };
-  riskBadge.innerHTML = `<span class="risk-dot"></span>${riskTexts[data.risk_level] || 'Unknown'}`;
-
-  // PII list
-  const piiList = document.getElementById('pii-list');
-  if (data.pii_types && data.pii_types.length > 0) {
-    piiList.innerHTML = data.pii_types.map(t => `<span class="pii-tag">${escapeHtml(t)}</span>`).join('');
-    showElement('pii-section');
-  } else {
-    piiList.innerHTML = '<span style="color:#555;font-size:12px;">None detected</span>';
-  }
-
-  // Sanitized preview
-  const preview = document.getElementById('sanitized-preview');
-  if (data.sanitized_preview !== undefined && data.sanitized_preview !== null) {
-    preview.textContent = data.sanitized_preview;
-    showElement('preview-section');
-  } else {
-    preview.textContent = '(No preview available)';
-  }
-
-  // Decision buttons for level 3
-  const decisionRow = document.getElementById('decision-row');
-  if (data.risk_level === 3) {
-    showElement('decision-row');
-    document.getElementById('send-btn').disabled = true;
-  } else {
-    hideElement('decision-row');
-    document.getElementById('send-btn').disabled = false;
-  }
-}
-
-/* ==================== SEND TO AI ==================== */
-async function sendToAI() {
-  if (!currentInput) return;
-  await doSend(currentInput, false);
-}
-
-async function sendRedacted() {
-  if (!lastCheckResult || !lastCheckResult.sanitized_preview) return;
-  await doSend(lastCheckResult.sanitized_preview, true);
-}
-
-function cancelSend() {
-  hideElement('decision-row');
-  document.getElementById('send-btn').disabled = false;
-}
-
-async function doSend(content, isRedacted) {
   const sendBtn = document.getElementById('send-btn');
   sendBtn.disabled = true;
   sendBtn.textContent = 'Sending...';
 
+  hideSecBar();
+
   try {
+    const body = {content};
+    if (currentConvId) body.conversation_id = currentConvId;
+
     const res = await fetch(`${API}/api/chat`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({content}),
+      headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+      body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error('Failed to send message');
+
+    if (res.status === 400) {
+      const err = await res.json();
+      addMessage('system', `Blocked: ${escapeHtml(err.detail || 'Request blocked')}`);
+      input.value = '';
+      loadConversations(); loadLogs();
+      return;
+    }
+    if (res.status === 429) {
+      const err = await res.json();
+      addMessage('system', `Rate Limited: ${escapeHtml(err.detail || 'Too many requests')}`);
+      loadLogs();
+      return;
+    }
+    if (!res.ok) throw new Error('Send failed');
+
     const data = await res.json();
 
-    // Show user message
-    addResponseMessage('user-msg', 'Your Input', escapeHtml(content));
+    // Show user message in chat
+    const displayText = data.pii_redacted && data.sanitized_content
+      ? escapeHtml(data.sanitized_content) + ' <span class="pii-tag">PII Redacted</span>'
+      : escapeHtml(content);
+    addMessage('user', displayText);
 
-    if (data.blocked) {
-      // Blocked
-      const blockedDiv = document.createElement('div');
-      blockedDiv.className = 'blocked-banner';
-      blockedDiv.innerHTML = `
-        <span class="blocked-icon">&#128683;</span>
-        <div>
-          <div class="blocked-text">Message Blocked</div>
-          <div class="blocked-reason">${escapeHtml(data.reason || 'High-risk content detected')}</div>
-        </div>
-      `;
-      document.getElementById('response-area').appendChild(blockedDiv);
-    } else {
-      // AI response
-      const reply = data.llm_reply || data.reply || data.message || 'No response';
-      addResponseMessage('ai-msg', 'AI Response', simpleMarkdown(reply));
+    // Track new conversation
+    currentConvId = data.conversation_id;
+    document.getElementById('conv-label').textContent = `(#${currentConvId})`;
+    document.getElementById('chat-title').textContent = content.slice(0, 50);
+    loadConversations();
+
+    // Security info banner
+    if (data.pii_redacted && data.pii_types?.length) {
+      if (data.risk_level === 2) {
+        addMessage('system', `🔒 PII detected & auto-redacted: ${data.pii_types.join(', ')}`);
+      } else if (data.risk_level === 1) {
+        addMessage('system', `ℹ️ Low-risk PII detected (sent directly): ${data.pii_types.join(', ')}`);
+      }
     }
 
-    // Refresh logs
-    loadSecurityLogs();
+    if (data.blocked) {
+      addMessage('blocked', data.reason || 'High-risk content blocked');
+    } else if (data.llm_reply) {
+      addMessage('ai', simpleMarkdown(data.llm_reply));
+    } else if (data.llm_enabled) {
+      addMessage('system', 'LLM is enabled but no response was generated.');
+    } else {
+      addMessage('system', 'LLM is not configured. Add an API config in Settings ⚙️.');
+    }
+    if (data.model_info?.name) {
+      document.getElementById('model-tag').textContent = `⚡ ${data.model_info.name}`;
+    }
+
+    input.value = '';
+    input.style.height = 'auto';
+    loadLogs();
   } catch (e) {
-    addResponseMessage('blocked-msg', 'Error', escapeHtml(e.message));
+    addMessage('system', `Error: ${escapeHtml(e.message)}`);
   } finally {
     sendBtn.disabled = false;
-    sendBtn.textContent = 'Send to AI';
+    sendBtn.textContent = 'Send';
+    document.getElementById('chat-input').focus();
   }
 }
 
-function addResponseMessage(cssClass, label, htmlContent) {
-  const area = document.getElementById('response-area');
-  // Remove welcome message if present
-  if (area.querySelector('.welcome-msg')) {
-    area.innerHTML = '';
+/* ==================== CHECK SECURITY (Preview) ==================== */
+async function checkSecurity() {
+  const content = document.getElementById('chat-input').value.trim();
+  if (!content) return;
+
+  const checkBtn = document.getElementById('check-btn');
+  checkBtn.disabled = true;
+  checkBtn.textContent = '🔍 ...';
+
+  try {
+    const res = await fetch(`${API}/api/security-check`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+      body: JSON.stringify({content}),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    lastCheckResult = data;
+    showSecBar(data);
+  } catch (e) {}
+  checkBtn.disabled = false;
+  checkBtn.textContent = '🔍 Check';
+}
+
+function showSecBar(data) {
+  const bar = document.getElementById('sec-bar');
+
+  // Risk badge
+  const risk = document.getElementById('sec-risk');
+  const level = data.risk_level || 1;
+  const riskMap = {1:['g','Low Risk'],2:['o','Caution'],3:['r','High Risk']};
+  const [dot, label] = riskMap[level] || ['g','Safe'];
+  risk.className = 'risk-badge risk-l'+level;
+  risk.innerHTML = `<span class="dot ${dot}"></span>${label}`;
+
+  // PII types
+  const pii = document.getElementById('sec-pii');
+  pii.innerHTML = (data.pii_types || []).map(t => `<span class="pii-tag-sm">${escapeHtml(t)}</span>`).join('');
+
+  // Preview
+  const preview = document.getElementById('sec-preview');
+  if (data.sanitized_preview) {
+    const highlighted = escapeHtml(data.sanitized_preview).replace(/\[(\w+)_REDACTED\]/g, '<span class="redacted">[$1_REDACTED]</span>');
+    preview.innerHTML = highlighted;
+  } else {
+    preview.textContent = '';
   }
-  const div = document.createElement('div');
-  div.className = 'response-message ' + cssClass;
-  div.innerHTML = `<div class="msg-label">${label}</div><div class="msg-content">${htmlContent}</div>`;
-  area.appendChild(div);
-  area.scrollTop = area.scrollHeight;
+
+  // Actions
+  document.getElementById('sec-send-redacted').style.display = level === 3 ? 'inline-block' : 'none';
+  document.getElementById('sec-cancel').style.display = level === 3 ? 'inline-block' : 'none';
+
+  bar.classList.add('show');
+}
+
+function hideSecBar() {
+  document.getElementById('sec-bar').classList.remove('show');
+  lastCheckResult = null;
+}
+
+function sendRedacted() {
+  if (!lastCheckResult?.sanitized_preview) return;
+  document.getElementById('chat-input').value = lastCheckResult.sanitized_preview;
+  hideSecBar();
+  sendMessage();
 }
 
 /* ==================== SECURITY LOGS ==================== */
-async function loadSecurityLogs() {
+let logsVisible = false;
+
+function toggleLogs() {
+  logsVisible = !logsVisible;
+  document.getElementById('logs-list').style.display = logsVisible ? '' : 'none';
+  document.getElementById('logs-toggle').textContent = logsVisible ? '▲' : '▼';
+  if (logsVisible) loadLogs();
+}
+
+async function loadLogs() {
   try {
-    const res = await fetch(`${API}/api/security-logs`, {
-      headers: {'Authorization': `Bearer ${token}`},
+    const res = await fetch(`${API}/api/security-logs`, {headers: {'Authorization': `Bearer ${token}`}});
+    if (!res.ok) return;
+    const data = await res.json();
+    const logs = data.logs || [];
+    const list = document.getElementById('logs-list');
+    if (logs.length === 0) {
+      list.innerHTML = '<div class="list-empty" style="padding:15px">No logs yet</div>';
+      return;
+    }
+    list.innerHTML = '';
+    logs.slice(0, 20).forEach(log => {
+      const item = document.createElement('div');
+      item.className = 'log-item';
+      const level = log.risk_level || 1;
+      const time = log.created_at ? new Date(log.created_at).toLocaleString('zh-CN', {hour:'2-digit',minute:'2-digit'}) : '—';
+      const action = (log.action_type || '').replace('CHAT_', '').replace('_', ' ');
+      const extra = log.pii_types_detected?.length ? log.pii_types_detected.join(',') : '';
+      item.innerHTML = `
+        <div class="log-dot l${level}"></div>
+        <div class="log-body">
+          <div class="log-time">${escapeHtml(time)}</div>
+          <div class="log-text">${escapeHtml(action)}${extra ? ' — '+escapeHtml(extra) : ''}</div>
+        </div>
+      `;
+      list.appendChild(item);
     });
-    if (!res.ok) throw new Error('Failed to load logs');
-    const logs = await res.json();
-    renderLogs(logs);
-  } catch (e) {
-    // Silently fail or show minimal error
-    const list = document.getElementById('log-list');
-    list.innerHTML = '<div class="log-empty">Failed to load logs</div>';
-  }
+  } catch (e) {}
 }
 
-function renderLogs(logs) {
-  const list = document.getElementById('log-list');
-  if (!logs || logs.length === 0) {
-    list.innerHTML = '<div class="log-empty">No security logs yet</div>';
-    return;
+/* ==================== SETTINGS ==================== */
+function toggleSettings() {
+  document.getElementById('settings-dropdown').classList.toggle('show');
+}
+document.addEventListener('click', e => {
+  const dd = document.getElementById('settings-dropdown');
+  if (dd.classList.contains('show') && !e.target.closest('.user-avatar')) {
+    dd.classList.remove('show');
   }
-  list.innerHTML = '';
-  logs.slice().reverse().forEach(log => {
-    const item = document.createElement('div');
-    item.className = 'log-item';
-    const level = log.risk_level || 1;
-    const actionClass = log.action === 'block' ? 'action-block' : log.action === 'redact' ? 'action-redact' : 'action-send';
-    const actionText = log.action === 'block' ? 'Blocked' : log.action === 'redact' ? 'Redacted' : 'Sent';
-    const timeStr = log.created_at ? formatTime(log.created_at) : '—';
-    item.innerHTML = `
-      <div class="log-dot level-${level}"></div>
-      <div class="log-body">
-        <div class="log-time">${escapeHtml(timeStr)}</div>
-        <div class="log-action"><span class="${actionClass}">${actionText}</span> — ${escapeHtml(log.operation_type || 'send')}</div>
-      </div>
-    `;
-    list.appendChild(item);
-  });
+});
+
+function toggleTheme(e) {
+  e.stopPropagation();
+  const el = document.getElementById('theme-toggle');
+  const isLight = el.classList.toggle('on');
+  document.body.classList.toggle('light', isLight);
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
 }
 
-function formatTime(iso) {
+/* ==================== MODEL INFO ==================== */
+async function loadModelInfo() {
   try {
-    const d = new Date(iso);
-    return d.toLocaleString('zh-CN', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
-  } catch (e) { return iso; }
+    const res = await fetch(`${API}/api/configs/active`, {headers: {'Authorization': `Bearer ${token}`}});
+    if (!res.ok) return;
+    const cfg = await res.json();
+    const tag = document.getElementById('model-tag');
+    if (cfg?.model) {
+      const keyStatus = cfg.has_key ? '' : ' ⚠️ no key';
+      tag.textContent = `⚡ ${cfg.model}${keyStatus}`;
+    } else {
+      tag.textContent = '';
+    }
+  } catch (e) {}
 }
 
-/* ==================== UTILS ==================== */
+/* ==================== SETTINGS MODAL ==================== */
+let editingConfigId = null;
+let editingPiiId = null;
+
+function openSettings() {
+  document.getElementById('settings-modal').classList.add('show');
+  loadApiConfigs();
+  loadCustomPii();
+}
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('show');
+  hideApiConfigForm();
+  hidePiiForm();
+}
+document.addEventListener('click', e => {
+  if (e.target.closest && e.target.closest('.modal')) return;
+  if (e.target.classList?.contains('modal-overlay')) closeSettings();
+});
+
+function switchSettingTab(tab) {
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.getElementById('tab-api-config').style.display = tab === 'api-config' ? '' : 'none';
+  document.getElementById('tab-custom-pii').style.display = tab === 'custom-pii' ? '' : 'none';
+  if (tab === 'api-config') loadApiConfigs();
+  else loadCustomPii();
+}
+
+/* ==================== API CONFIG CRUD ==================== */
+let configEditId = null;
+
+function showApiConfigForm(data) {
+  const form = document.getElementById('api-config-form');
+  form.classList.remove('hidden');
+  configEditId = data?.id || null;
+  document.getElementById('ac-name').value = data?.name || '';
+  document.getElementById('ac-base-url').value = data?.base_url || 'https://api.deepseek.com/v1';
+  document.getElementById('ac-api-key').value = data?.api_key || '';
+  document.getElementById('ac-model').value = data?.model || 'deepseek-v4-flash';
+  document.getElementById('ac-save-btn').textContent = configEditId ? 'Update' : 'Save';
+}
+function hideApiConfigForm() {
+  document.getElementById('api-config-form').classList.add('hidden');
+  configEditId = null;
+}
+async function saveApiConfig() {
+  const name = document.getElementById('ac-name').value.trim();
+  const base_url = document.getElementById('ac-base-url').value.trim();
+  const api_key = document.getElementById('ac-api-key').value.trim();
+  const model = document.getElementById('ac-model').value.trim();
+  if (!name) { alert('Name is required'); return; }
+  const url = configEditId ? `${API}/api/configs/${configEditId}` : `${API}/api/configs`;
+  const method = configEditId ? 'PUT' : 'POST';
+  await fetch(url, {
+    method, headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+    body: JSON.stringify({name, base_url, api_key, model}),
+  });
+  hideApiConfigForm();
+  loadApiConfigs();
+  loadModelInfo();
+}
+async function loadApiConfigs() {
+  try {
+    const res = await fetch(`${API}/api/configs`, {headers: {'Authorization': `Bearer ${token}`}});
+    if (!res.ok) return;
+    const configs = await res.json();
+    const list = document.getElementById('api-config-list');
+    if (!configs?.length) { list.innerHTML = '<div class="list-empty">No API configs yet</div>'; return; }
+    list.innerHTML = '';
+    configs.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'api-config-item';
+      const activeBadge = c.is_active ? '<span class="badge-active">ACTIVE</span>' : '';
+      div.innerHTML = `
+        <div class="info">
+          <div class="name">${escapeHtml(c.name)}${activeBadge}</div>
+          <div class="detail">${escapeHtml(c.model)} — ${escapeHtml(c.base_url)}</div>
+        </div>
+        <div class="actions">
+          <button class="btn-primary btn-sm" onclick="activateConfig(${c.id})">Activate</button>
+          <button class="btn-outline btn-sm" onclick="showApiConfigForm(${JSON.stringify({id:c.id,name:c.name,base_url:c.base_url,model:c.model,api_key:''}).replace(/"/g,'&quot;')})">Edit</button>
+          <button class="btn-danger btn-sm" onclick="deleteConfig(${c.id})">×</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  } catch (e) {}
+}
+async function activateConfig(id) {
+  await fetch(`${API}/api/configs/${id}/activate`, {method:'POST', headers:{'Authorization': `Bearer ${token}`}});
+  loadApiConfigs();
+  loadModelInfo();
+}
+async function deleteConfig(id) {
+  if (!confirm('Delete this config?')) return;
+  await fetch(`${API}/api/configs/${id}`, {method:'DELETE', headers:{'Authorization': `Bearer ${token}`}});
+  loadApiConfigs();
+  loadModelInfo();
+}
+
+/* ==================== CUSTOM PII CRUD ==================== */
+function showPiiForm(data) {
+  const form = document.getElementById('pii-form');
+  form.classList.remove('hidden');
+  editingPiiId = data?.id || null;
+  document.getElementById('pii-name').value = data?.name || '';
+  document.getElementById('pii-pattern').value = data?.pattern || '';
+  document.getElementById('pii-risk').value = data?.risk_level || 2;
+  document.getElementById('pii-save-btn').textContent = editingPiiId ? 'Update' : 'Save';
+}
+function hidePiiForm() {
+  document.getElementById('pii-form').classList.add('hidden');
+  editingPiiId = null;
+}
+async function saveCustomPii() {
+  const name = document.getElementById('pii-name').value.trim();
+  const pattern = document.getElementById('pii-pattern').value.trim();
+  const risk_level = parseInt(document.getElementById('pii-risk').value);
+  if (!name) { alert('Name is required'); return; }
+  try { new RegExp(pattern); } catch (e) { alert('Invalid regex pattern: ' + e.message); return; }
+  const url = editingPiiId ? `${API}/api/custom-pii/${editingPiiId}` : `${API}/api/custom-pii`;
+  const method = editingPiiId ? 'PUT' : 'POST';
+  await fetch(url, {
+    method, headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+    body: JSON.stringify({name, pattern, risk_level}),
+  });
+  hidePiiForm();
+  loadCustomPii();
+}
+async function loadCustomPii() {
+  try {
+    const res = await fetch(`${API}/api/custom-pii`, {headers: {'Authorization': `Bearer ${token}`}});
+    if (!res.ok) return;
+    const items = await res.json();
+    const list = document.getElementById('custom-pii-list');
+    if (!items?.length) { list.innerHTML = '<div class="list-empty">No custom PII rules yet</div>'; return; }
+    list.innerHTML = '';
+    items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'pii-item';
+      const riskClass = 'r' + (item.risk_level || 2);
+      div.innerHTML = `
+        <div class="info">
+          <div class="name">${escapeHtml(item.name)} <span class="badge-risk ${riskClass}">L${item.risk_level}</span></div>
+          <div class="detail"><code>/${escapeHtml(item.pattern)}/</code></div>
+        </div>
+        <div class="actions">
+          <button class="btn-outline btn-sm" onclick="showPiiForm(${JSON.stringify({id:item.id,name:item.name,pattern:item.pattern,risk_level:item.risk_level}).replace(/"/g,'&quot;')})">Edit</button>
+          <button class="btn-danger btn-sm" onclick="deleteCustomPii(${item.id})">×</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  } catch (e) {}
+}
+async function deleteCustomPii(id) {
+  if (!confirm('Delete this rule?')) return;
+  await fetch(`${API}/api/custom-pii/${id}`, {method:'DELETE', headers:{'Authorization': `Bearer ${token}`}});
+  loadCustomPii();
+}
+
+/* ==================== HELPERS ==================== */
+function addMessage(role, html) {
+  const container = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = `<div class="msg-content">${html}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
 function escapeHtml(text) {
   if (!text) return '';
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
 }
 
 function simpleMarkdown(text) {
   if (!text) return '';
   let html = escapeHtml(text);
-
-  // Code blocks
   html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-  // Inline code
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-  // Bold
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  // Italic
   html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  // Headers
   html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
   html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
   html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-  // Blockquote
   html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-  // Unordered list
   html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
   html = html.replace(/(<li>.+<\/li>\n?)+/g, '<ul>$&</ul>');
-  // Ordered list
   html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-  // Horizontal rule
   html = html.replace(/^---$/gm, '<hr>');
-  // Links
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-  // Line breaks
   html = html.replace(/\n/g, '<br>');
-
   return html;
 }
 
@@ -592,6 +1003,9 @@ document.addEventListener('DOMContentLoaded', () => {
     currentUser = JSON.parse(savedUser);
     showApp();
   }
+  document.getElementById('chat-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
 });
 </script>
 </body>
